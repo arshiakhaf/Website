@@ -337,8 +337,10 @@ foreach ( $catalog as $i => $data ) {
 	$product->set_short_description( $data['short'] );
 	$product->set_category_ids( array( $cat_ids[ $data['cat'] ] ) );
 	$product->set_stock_status( $data['stock'] );
-	$product->set_manage_stock( true );
-	$product->set_stock_quantity( 25 );
+	$product->set_manage_stock( ! $is_variable );
+	if ( ! $is_variable ) {
+		$product->set_stock_quantity( 25 );
+	}
 	$product->set_featured( ! empty( $data['featured'] ) );
 
 	if ( ! $is_variable ) {
