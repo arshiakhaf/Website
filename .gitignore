@@ -1,0 +1,19 @@
+# --- Runtime generated files (never commit credentials) ---
+.env
+wordpress/wp-config.php
+wordpress/wp-content/upgrade/*
+wordpress/wp-content/uploads/*
+!wordpress/wp-content/uploads/index.php
+*.log
+*.sql
+
+# --- Build scratch ---
+.build/
+node_modules/
+.tmp/
+
+# --- OS / editor ---
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

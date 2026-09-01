@@ -1,0 +1,59 @@
+# ============================================================
+#  فروشگاه ووکامرس «آرین‌شاپ» — اجرای آفلاین با Docker
+#  شروع:   docker compose up -d --build
+#  سایت:   http://localhost:8080
+#  پیشخوان: http://localhost:8080/wp-admin
+# ============================================================
+
+services:
+  db:
+    image: mariadb:10.11
+    container_name: arian-db
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root_secret_2026}
+      MARIADB_DATABASE: ${DB_NAME:-arian}
+      MARIADB_USER: ${DB_USER:-arian}
+      MARIADB_PASSWORD: ${DB_PASSWORD:-arian_pass_2026}
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - dbdata:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 20s
+
+  web:
+    build: .
+    container_name: arian-web
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_NAME: ${DB_NAME:-arian}
+      DB_USER: ${DB_USER:-arian}
+      DB_PASSWORD: ${DB_PASSWORD:-arian_pass_2026}
+      SITE_URL: ${SITE_URL:-http://localhost:8080}
+      WP_ADMIN_USER: ${WP_ADMIN_USER:-admin}
+      WP_ADMIN_PASSWORD: ${WP_ADMIN_PASSWORD:-Admin@1234}
+      WP_ADMIN_EMAIL: ${WP_ADMIN_EMAIL:-admin@arian-shop.local}
+    ports:
+      - "${WEB_PORT:-8080}:80"
+    volumes:
+      # کل سایت روی دیسک شما نگه داشته می‌شود → بکاپ/ویرایش آسان
+      - ./wordpress:/var/www/html
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost/ >/dev/null || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 45s
+
+volumes:
+  dbdata:
