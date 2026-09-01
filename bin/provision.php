@@ -153,6 +153,25 @@ try {
 	/* صفحات ووکامرس (فروشگاه / سبد / تسویه / حساب) */
 	if ( class_exists( 'WC_Install' ) ) {
 		WC_Install::create_pages();
+
+		/* فارسی‌سازی عنوان صفحات پیش‌فرض ووکامرس */
+		$wc_pages = array(
+			'woocommerce_shop_page_id'      => 'فروشگاه',
+			'woocommerce_cart_page_id'      => 'سبد خرید',
+			'woocommerce_checkout_page_id'  => 'تسویه حساب',
+			'woocommerce_myaccount_page_id' => 'حساب کاربری',
+		);
+		foreach ( $wc_pages as $opt => $title ) {
+			$pid = (int) get_option( $opt );
+			if ( $pid ) {
+				wp_update_post(
+					array(
+						'ID'         => $pid,
+						'post_title' => $title,
+					)
+				);
+			}
+		}
 	}
 
 	/* ساخت صفحات اختصاصی سایت */
